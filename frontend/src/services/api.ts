@@ -13,13 +13,19 @@ export interface AnalyzeResponse {
   }
 }
 
-export async function analyzeDiary(content: string, language: string = 'en'): Promise<AnalyzeResponse> {
+export type AIModel = 'openai' | 'gemini'
+
+export async function analyzeDiary(
+  content: string,
+  language: string = 'en',
+  model: AIModel = 'openai'
+): Promise<AnalyzeResponse> {
   const response = await fetch(`${API_URL}/api/analyze`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ content, language }),
+    body: JSON.stringify({ content, language, model }),
   })
 
   if (!response.ok) {

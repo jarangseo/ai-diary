@@ -3,12 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { saveDiary, getDiary, updateDiaryEmotion } from '../services/db'
 import { analyzeDiary, type AnalyzeResponse } from '../services/api'
 import { useTranslation } from '../hooks/useTranslation'
+import { useSettingsStore } from '../stores/settingsStore'
 import type { DiaryEmotion } from '../types/diary'
 
 export default function DiaryWritePage() {
   const { date } = useParams()
   const navigate = useNavigate()
   const { t, formatDate, language } = useTranslation()
+  const aiModel = useSettingsStore((state) => state.aiModel)
   const [content, setContent] = useState('')
   const [isRecordOnly, setIsRecordOnly] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -53,7 +55,7 @@ export default function DiaryWritePage() {
     setError(null)
     try {
       await saveDiary(today, content, isRecordOnly)
-      const result = await analyzeDiary(content, language)
+      const result = await analyzeDiary(content, language, aiModel)
       setAnalysisResult(result)
 
       // Save emotion to IndexedDB

@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useTranslation } from '../hooks/useTranslation'
 import { useLanguageStore } from '../stores/languageStore'
+import { useSettingsStore, type AIModel } from '../stores/settingsStore'
 
 export default function SettingsPage() {
   const { t } = useTranslation()
   const { language, setLanguage } = useLanguageStore()
+  const { aiModel, setAIModel } = useSettingsStore()
   const [aiEnabled, setAiEnabled] = useState(true)
   const [autoShowAI, setAutoShowAI] = useState(true)
 
@@ -85,6 +87,34 @@ export default function SettingsPage() {
             className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50"
           />
         </label>
+
+        <div className="space-y-2">
+          <span className="text-gray-700">{t('aiModel')}</span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setAIModel('openai')}
+              disabled={!aiEnabled}
+              className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
+                aiModel === 'openai'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {t('openai')}
+            </button>
+            <button
+              onClick={() => setAIModel('gemini')}
+              disabled={!aiEnabled}
+              className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
+                aiModel === 'gemini'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {t('gemini')}
+            </button>
+          </div>
+        </div>
       </section>
 
       {/* Data Management */}

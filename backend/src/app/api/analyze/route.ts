@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import OpenAI from 'openai'
 import { z } from 'zod'
 
 const CORS_HEADERS = {
@@ -12,6 +13,7 @@ const CORS_HEADERS = {
 const analyzeRequestSchema = z.object({
   content: z.string().min(1).max(10000),
   language: z.enum(['en', 'ko', 'de']).optional().default('en'),
+  model: z.enum(['openai', 'gemini']).optional().default('openai'),
 })
 
 // Response schema for AI output
@@ -235,7 +237,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { content, language } = parsed.data
+    const { content, language, model: aiModel } = parsed.data
 
     // Check for safety alert first
     if (checkSafetyAlert(content, language)) {
@@ -248,17 +250,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Use mock response in development or when API key is not set
-    const useMock = process.env.USE_MOCK === 'true' || !process.env.GEMINI_API_KEY
+    // Use mock response in development or when API keys are not set
+    const hasApiKey = aiModel === 'openai' ? process.env.OPENAI_API_KEY : process.env.GEMINI_API_KEY
+    const useMock = process.env.USE_MOCK === 'true' || !hasApiKey
 
     if (useMock) {
       const mockResponse = getMockResponse(content, language)
       return NextResponse.json(mockResponse, { headers: CORS_HEADERS })
     }
-
-    // Initialize Gemini client
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
 
     const languageInstructions: Record<Language, string> = {
       ko: '모든 응답은 한국어로 작성하세요.',
@@ -292,9 +291,30 @@ Rules:
 - Make reflection questions open-ended
 - Use specific emotion labels (e.g., 'disappointment' instead of 'sadness')`
 
-    const result = await model.generateContent(prompt)
-    const response = result.response
-    const text = response.text()
+    let text: string
+
+    if (aiModel === 'openai') {
+      // Use OpenAI API
+      const openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      })
+
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: prompt }],
+        response_format: { type: 'json_object' },
+      })
+
+      text = completion.choices[0].message.content || ''
+    } else {
+      // Use Gemini API
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
+      const geminiModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
+
+      const result = await geminiModel.generateContent(prompt)
+      const response = result.response
+      text = response.text()
+    }
 
     // Extract JSON from response (handle markdown code blocks)
     let jsonStr = text
