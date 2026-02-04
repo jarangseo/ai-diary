@@ -8,9 +8,17 @@ export function useTranslation() {
     return translations[language][key]
   }
 
+  const getLocale = () => {
+    switch (language) {
+      case 'ko': return 'ko-KR'
+      case 'de': return 'de-DE'
+      default: return 'en-US'
+    }
+  }
+
   const formatDate = (date: Date | string): string => {
     const d = typeof date === 'string' ? new Date(date) : date
-    return d.toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US', {
+    return d.toLocaleDateString(getLocale(), {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -20,7 +28,7 @@ export function useTranslation() {
 
   const formatMonthYear = (date: Date | string): string => {
     const d = typeof date === 'string' ? new Date(date) : date
-    return d.toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US', {
+    return d.toLocaleDateString(getLocale(), {
       year: 'numeric',
       month: 'long',
     })

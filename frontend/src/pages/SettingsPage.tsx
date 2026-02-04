@@ -27,10 +27,10 @@ export default function SettingsPage() {
       {/* Language Settings */}
       <section className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 space-y-4">
         <h2 className="font-semibold text-gray-900">{t('language')}</h2>
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <button
             onClick={() => setLanguage('en')}
-            className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
               language === 'en'
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -40,13 +40,23 @@ export default function SettingsPage() {
           </button>
           <button
             onClick={() => setLanguage('ko')}
-            className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
               language === 'ko'
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
             {t('korean')}
+          </button>
+          <button
+            onClick={() => setLanguage('de')}
+            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+              language === 'de'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {t('german')}
           </button>
         </div>
       </section>

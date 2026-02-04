@@ -54,6 +54,7 @@ export const translations = {
     language: 'Language',
     korean: 'Korean',
     english: 'English',
+    german: 'German',
   },
   ko: {
     // Common
@@ -110,6 +111,64 @@ export const translations = {
     language: '언어',
     korean: '한국어',
     english: '영어',
+    german: '독일어',
+  },
+  de: {
+    // Common
+    save: 'Speichern',
+    cancel: 'Abbrechen',
+    delete: 'Löschen',
+    edit: 'Bearbeiten',
+    loading: 'Laden...',
+    saving: 'Speichern...',
+    autoSaved: 'Automatisch gespeichert',
+
+    // Navigation
+    home: 'Startseite',
+    write: 'Schreiben',
+    settings: 'Einstellungen',
+
+    // Home Page
+    today: 'Heute',
+    monthRecords: 'Einträge diesen Monat',
+    days: 'Tage',
+    mainEmotion: 'Hauptemotion',
+    noData: '-',
+    emptyStateMessage: 'Beginne deinen ersten Eintrag',
+    writeTodayDiary: 'Tagebuch schreiben',
+    weekdays: ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'],
+
+    // Write Page
+    howWasYourDay: 'Wie war dein Tag?',
+    recordOnly: 'Nur aufzeichnen',
+    getAIFeedback: 'KI-Feedback erhalten',
+
+    // Detail Page
+    noDiaryFound: 'Kein Tagebucheintrag gefunden.',
+    writeDiary: 'Tagebuch schreiben',
+    emotionScore: 'Emotionswert',
+    aiFeedback: 'KI-Feedback',
+    hide: 'Ausblenden',
+    reflectionQuestions: 'Reflexionsfragen:',
+    confirmDelete: 'Möchtest du wirklich löschen?',
+
+    // Settings Page
+    aiFeatures: 'KI-Funktionen',
+    useAIFeatures: 'KI-Funktionen verwenden',
+    autoShowAIResults: 'KI-Ergebnisse automatisch anzeigen',
+    dataManagement: 'Datenverwaltung',
+    exportData: 'Daten exportieren',
+    deleteAllData: 'Alle Daten löschen',
+    notices: 'Hinweis',
+    noticeItems: [
+      'Dieser Service ist keine medizinische Beratung.',
+      'Tagebucheinträge werden standardmäßig lokal auf deinem Gerät gespeichert.',
+      'KI-Analysen werden nur auf Anfrage an den Server gesendet und der Text wird nach der Analyse nicht gespeichert.',
+    ],
+    language: 'Sprache',
+    korean: 'Koreanisch',
+    english: 'Englisch',
+    german: 'Deutsch',
   },
 } as const
 
