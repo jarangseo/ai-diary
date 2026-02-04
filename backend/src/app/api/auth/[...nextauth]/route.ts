@@ -1,6 +1,5 @@
 import NextAuth, { type NextAuthOptions } from 'next-auth'
 import type { JWT } from 'next-auth/jwt'
-import type { Session } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import GitHubProvider from 'next-auth/providers/github'
 
@@ -8,11 +7,6 @@ interface ExtendedToken extends JWT {
   accessToken?: string
   provider?: string
   id?: string
-}
-
-interface ExtendedSession extends Session {
-  accessToken?: string
-  provider?: string
 }
 
 export const authOptions: NextAuthOptions = {
@@ -27,7 +21,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, account, profile }): Promise<ExtendedToken> {
+    async jwt({ token, account, profile }) {
       if (account) {
         token.accessToken = account.access_token
         token.provider = account.provider
@@ -35,9 +29,9 @@ export const authOptions: NextAuthOptions = {
                    (profile as { sub?: string; id?: string })?.id ||
                    token.sub
       }
-      return token as ExtendedToken
+      return token
     },
-    async session({ session, token }): Promise<ExtendedSession> {
+    async session({ session, token }) {
       const extendedToken = token as ExtendedToken
       return {
         ...session,
@@ -46,7 +40,7 @@ export const authOptions: NextAuthOptions = {
         user: {
           ...session.user,
           id: extendedToken.id || extendedToken.sub,
-        },
+        } as { id?: string; name?: string | null; email?: string | null; image?: string | null },
       }
     },
     async redirect({ url }) {
