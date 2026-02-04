@@ -1,8 +1,13 @@
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
+import { getDiary, deleteDiary } from '../services/db'
+import type { Diary } from '../types/diary'
 
 export default function DiaryDetailPage() {
   const { date } = useParams()
   const navigate = useNavigate()
+  const [diary, setDiary] = useState<Diary | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   const formattedDate = date
     ? new Date(date).toLocaleDateString('ko-KR', {
@@ -13,14 +18,61 @@ export default function DiaryDetailPage() {
       })
     : ''
 
-  // TODO: Load diary from IndexedDB
-  const diary = {
-    content: '오늘은 좋은 하루였다...',
-    emotion: null as null | {
-      primary: string
-      score: number
-      summary: string
-    },
+  useEffect(() => {
+    if (!date) return
+
+    let cancelled = false
+    getDiary(date).then((data) => {
+      if (!cancelled) {
+        setDiary(data ?? null)
+        setIsLoading(false)
+      }
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [date])
+
+  const handleDelete = async () => {
+    if (!date || !confirm('정말 삭제하시겠습니까?')) return
+
+    await deleteDiary(date)
+    navigate('/')
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-gray-500">불러오는 중...</div>
+      </div>
+    )
+  }
+
+  if (!diary) {
+    return (
+      <div className="space-y-6 pb-20">
+        <div className="flex items-center">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-2 -ml-2 text-gray-600 hover:text-gray-900"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+        </div>
+        <div className="text-center py-12">
+          <p className="text-gray-500 mb-4">일기가 없습니다.</p>
+          <Link
+            to={`/write/${date}`}
+            className="text-blue-600 hover:text-blue-700 font-medium"
+          >
+            일기 작성하기
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -79,19 +131,28 @@ export default function DiaryDetailPage() {
             </button>
           </div>
           <p className="text-gray-700 mb-4">{diary.emotion.summary}</p>
-          <div className="space-y-2">
-            <p className="text-sm text-gray-600">성찰 질문:</p>
-            <ul className="list-disc list-inside text-gray-700 space-y-1">
-              <li>오늘 가장 기억에 남는 순간은 무엇인가요?</li>
-            </ul>
-          </div>
+          {diary.emotion.questions && diary.emotion.questions.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm text-gray-600">성찰 질문:</p>
+              <ul className="list-disc list-inside text-gray-700 space-y-1">
+                {diary.emotion.questions.map((q, i) => (
+                  <li key={i}>{q}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       ) : (
-        <div className="text-center py-4">
-          <button className="text-blue-600 hover:text-blue-700 font-medium">
-            AI 피드백 받기
-          </button>
-        </div>
+        !diary.isRecordOnly && (
+          <div className="text-center py-4">
+            <Link
+              to={`/write/${date}`}
+              className="text-blue-600 hover:text-blue-700 font-medium"
+            >
+              AI 피드백 받기
+            </Link>
+          </div>
+        )
       )}
 
       {/* Actions */}
@@ -102,7 +163,10 @@ export default function DiaryDetailPage() {
         >
           편집
         </Link>
-        <button className="py-3 px-4 text-red-600 hover:text-red-700 font-medium">
+        <button
+          onClick={handleDelete}
+          className="py-3 px-4 text-red-600 hover:text-red-700 font-medium"
+        >
           삭제
         </button>
       </div>

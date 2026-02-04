@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { saveDiary, getDiary } from '../services/db'
 
 export default function DiaryWritePage() {
   const { date } = useParams()
   const navigate = useNavigate()
   const [content, setContent] = useState('')
   const [isRecordOnly, setIsRecordOnly] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
 
   const today = date || new Date().toISOString().split('T')[0]
   const formattedDate = new Date(today).toLocaleDateString('ko-KR', {
@@ -15,14 +17,34 @@ export default function DiaryWritePage() {
     weekday: 'long',
   })
 
-  const handleSave = () => {
-    // TODO: Save to IndexedDB
-    console.log('Saving diary:', { date: today, content, isRecordOnly })
+  useEffect(() => {
+    getDiary(today).then((diary) => {
+      if (diary) {
+        setContent(diary.content)
+        setIsRecordOnly(diary.isRecordOnly)
+      }
+    })
+  }, [today])
+
+  const handleSave = async () => {
+    setIsSaving(true)
+    try {
+      await saveDiary(today, content, isRecordOnly)
+      navigate(-1)
+    } finally {
+      setIsSaving(false)
+    }
   }
 
-  const handleRequestAI = () => {
-    // TODO: Request AI analysis
-    console.log('Requesting AI analysis')
+  const handleRequestAI = async () => {
+    setIsSaving(true)
+    try {
+      await saveDiary(today, content, isRecordOnly)
+      // TODO: Request AI analysis
+      console.log('Requesting AI analysis')
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -37,7 +59,9 @@ export default function DiaryWritePage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <span className="text-sm text-gray-500">자동 저장됨</span>
+        <span className="text-sm text-gray-500">
+          {isSaving ? '저장 중...' : '자동 저장됨'}
+        </span>
       </div>
 
       {/* Date */}
@@ -66,14 +90,15 @@ export default function DiaryWritePage() {
       <div className="flex gap-3">
         <button
           onClick={handleSave}
-          className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+          disabled={isSaving}
+          className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors disabled:opacity-50"
         >
           저장
         </button>
         {!isRecordOnly && (
           <button
             onClick={handleRequestAI}
-            disabled={!content.trim()}
+            disabled={!content.trim() || isSaving}
             className="flex-1 py-3 px-4 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             AI 피드백 받기
