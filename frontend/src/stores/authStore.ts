@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+// Remove trailing slash to prevent double slashes in URLs
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/+$/, '')
 
 export interface User {
   id: string
