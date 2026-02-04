@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { z } from 'zod'
 
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+}
+
 // Request schema
 const analyzeRequestSchema = z.object({
   content: z.string().min(1).max(10000),
@@ -43,6 +49,10 @@ const SAFETY_RESPONSE: EmotionAnalysis = {
   isSafetyAlert: true,
 }
 
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: CORS_HEADERS })
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -51,7 +61,7 @@ export async function POST(request: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid request body' },
-        { status: 400 }
+        { status: 400, headers: CORS_HEADERS }
       )
     }
 
@@ -59,17 +69,20 @@ export async function POST(request: NextRequest) {
 
     // Check for safety alert first
     if (checkSafetyAlert(content)) {
-      return NextResponse.json({
-        ...SAFETY_RESPONSE,
-        safetyResources: {
-          message: '힘든 시간을 보내고 계시다면, 전문적인 도움을 받아보세요.',
-          resources: [
-            { name: '자살예방상담전화', number: '1393' },
-            { name: '정신건강위기상담전화', number: '1577-0199' },
-            { name: '생명의전화', number: '1588-9191' },
-          ],
+      return NextResponse.json(
+        {
+          ...SAFETY_RESPONSE,
+          safetyResources: {
+            message: '힘든 시간을 보내고 계시다면, 전문적인 도움을 받아보세요.',
+            resources: [
+              { name: '자살예방상담전화', number: '1393' },
+              { name: '정신건강위기상담전화', number: '1577-0199' },
+              { name: '생명의전화', number: '1588-9191' },
+            ],
+          },
         },
-      })
+        { headers: CORS_HEADERS }
+      )
     }
 
     // Initialize OpenAI client
@@ -115,12 +128,13 @@ export async function POST(request: NextRequest) {
     const analysis = JSON.parse(result)
     const validated = emotionAnalysisSchema.parse(analysis)
 
-    return NextResponse.json(validated)
+    return NextResponse.json(validated, { headers: CORS_HEADERS })
   } catch (error) {
     console.error('Analysis error:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json(
-      { error: 'Failed to analyze diary' },
-      { status: 500 }
+      { error: 'Failed to analyze diary', detail: errorMessage },
+      { status: 500, headers: CORS_HEADERS }
     )
   }
 }

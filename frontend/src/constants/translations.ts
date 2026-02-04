@@ -28,6 +28,10 @@ export const translations = {
     howWasYourDay: 'How was your day?',
     recordOnly: 'Just record today',
     getAIFeedback: 'Get AI feedback',
+    analyzing: 'Analyzing...',
+    analysisError: 'Failed to analyze. Please try again.',
+    safetyAlertTitle: 'We care about you',
+    safetyAlertMessage: 'If you are going through a difficult time, please seek professional help.',
 
     // Detail Page
     noDiaryFound: 'No diary found.',
@@ -85,6 +89,10 @@ export const translations = {
     howWasYourDay: '오늘 하루는 어땠나요?',
     recordOnly: '오늘은 기록만 하기',
     getAIFeedback: 'AI 피드백 받기',
+    analyzing: '분석 중...',
+    analysisError: '분석에 실패했습니다. 다시 시도해주세요.',
+    safetyAlertTitle: '당신을 걱정합니다',
+    safetyAlertMessage: '힘든 시간을 보내고 계시다면, 전문적인 도움을 받아보세요.',
 
     // Detail Page
     noDiaryFound: '일기가 없습니다.',
@@ -142,6 +150,10 @@ export const translations = {
     howWasYourDay: 'Wie war dein Tag?',
     recordOnly: 'Nur aufzeichnen',
     getAIFeedback: 'KI-Feedback erhalten',
+    analyzing: 'Analysieren...',
+    analysisError: 'Analyse fehlgeschlagen. Bitte versuche es erneut.',
+    safetyAlertTitle: 'Wir sorgen uns um dich',
+    safetyAlertMessage: 'Wenn du eine schwere Zeit durchmachst, suche bitte professionelle Hilfe.',
 
     // Detail Page
     noDiaryFound: 'Kein Tagebucheintrag gefunden.',
