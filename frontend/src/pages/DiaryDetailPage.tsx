@@ -1,22 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { getDiary, deleteDiary } from '../services/db'
+import { useTranslation } from '../hooks/useTranslation'
 import type { Diary } from '../types/diary'
 
 export default function DiaryDetailPage() {
   const { date } = useParams()
   const navigate = useNavigate()
+  const { t, formatDate } = useTranslation()
   const [diary, setDiary] = useState<Diary | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  const formattedDate = date
-    ? new Date(date).toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        weekday: 'long',
-      })
-    : ''
+  const formattedDate = date ? formatDate(date) : ''
 
   useEffect(() => {
     if (!date) return
@@ -35,7 +30,7 @@ export default function DiaryDetailPage() {
   }, [date])
 
   const handleDelete = async () => {
-    if (!date || !confirm('정말 삭제하시겠습니까?')) return
+    if (!date || !confirm(t('confirmDelete') as string)) return
 
     await deleteDiary(date)
     navigate('/')
@@ -44,7 +39,7 @@ export default function DiaryDetailPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">불러오는 중...</div>
+        <div className="text-gray-500">{t('loading')}</div>
       </div>
     )
   }
@@ -63,12 +58,12 @@ export default function DiaryDetailPage() {
           </button>
         </div>
         <div className="text-center py-12">
-          <p className="text-gray-500 mb-4">일기가 없습니다.</p>
+          <p className="text-gray-500 mb-4">{t('noDiaryFound')}</p>
           <Link
             to={`/write/${date}`}
             className="text-blue-600 hover:text-blue-700 font-medium"
           >
-            일기 작성하기
+            {t('writeDiary')}
           </Link>
         </div>
       </div>
@@ -109,7 +104,7 @@ export default function DiaryDetailPage() {
             {diary.emotion.primary}
           </span>
           <span className="text-sm text-gray-500">
-            감정 점수: {diary.emotion.score.toFixed(1)}
+            {t('emotionScore')}: {diary.emotion.score.toFixed(1)}
           </span>
         </div>
       )}
@@ -125,15 +120,15 @@ export default function DiaryDetailPage() {
       {diary.emotion ? (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-medium text-gray-900">AI 피드백</h3>
+            <h3 className="font-medium text-gray-900">{t('aiFeedback')}</h3>
             <button className="text-sm text-gray-500 hover:text-gray-700">
-              숨기기
+              {t('hide')}
             </button>
           </div>
           <p className="text-gray-700 mb-4">{diary.emotion.summary}</p>
           {diary.emotion.questions && diary.emotion.questions.length > 0 && (
             <div className="space-y-2">
-              <p className="text-sm text-gray-600">성찰 질문:</p>
+              <p className="text-sm text-gray-600">{t('reflectionQuestions')}</p>
               <ul className="list-disc list-inside text-gray-700 space-y-1">
                 {diary.emotion.questions.map((q, i) => (
                   <li key={i}>{q}</li>
@@ -149,7 +144,7 @@ export default function DiaryDetailPage() {
               to={`/write/${date}`}
               className="text-blue-600 hover:text-blue-700 font-medium"
             >
-              AI 피드백 받기
+              {t('getAIFeedback')}
             </Link>
           </div>
         )
@@ -161,13 +156,13 @@ export default function DiaryDetailPage() {
           to={`/write/${date}`}
           className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 text-center rounded-xl font-medium hover:bg-gray-200 transition-colors"
         >
-          편집
+          {t('edit')}
         </Link>
         <button
           onClick={handleDelete}
           className="py-3 px-4 text-red-600 hover:text-red-700 font-medium"
         >
-          삭제
+          {t('delete')}
         </button>
       </div>
     </div>

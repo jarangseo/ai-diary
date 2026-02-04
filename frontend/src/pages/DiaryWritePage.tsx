@@ -1,21 +1,18 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { saveDiary, getDiary } from '../services/db'
+import { useTranslation } from '../hooks/useTranslation'
 
 export default function DiaryWritePage() {
   const { date } = useParams()
   const navigate = useNavigate()
+  const { t, formatDate } = useTranslation()
   const [content, setContent] = useState('')
   const [isRecordOnly, setIsRecordOnly] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
 
   const today = date || new Date().toISOString().split('T')[0]
-  const formattedDate = new Date(today).toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    weekday: 'long',
-  })
+  const formattedDate = formatDate(today)
 
   useEffect(() => {
     getDiary(today).then((diary) => {
@@ -60,7 +57,7 @@ export default function DiaryWritePage() {
           </svg>
         </button>
         <span className="text-sm text-gray-500">
-          {isSaving ? '저장 중...' : '자동 저장됨'}
+          {isSaving ? t('saving') : t('autoSaved')}
         </span>
       </div>
 
@@ -71,7 +68,7 @@ export default function DiaryWritePage() {
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        placeholder="오늘 하루는 어땠나요?"
+        placeholder={t('howWasYourDay') as string}
         className="w-full h-64 p-4 bg-white border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
       />
 
@@ -83,7 +80,7 @@ export default function DiaryWritePage() {
           onChange={(e) => setIsRecordOnly(e.target.checked)}
           className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
         />
-        <span className="text-gray-700">오늘은 기록만 하기</span>
+        <span className="text-gray-700">{t('recordOnly')}</span>
       </label>
 
       {/* Action Buttons */}
@@ -93,7 +90,7 @@ export default function DiaryWritePage() {
           disabled={isSaving}
           className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors disabled:opacity-50"
         >
-          저장
+          {t('save')}
         </button>
         {!isRecordOnly && (
           <button
@@ -101,7 +98,7 @@ export default function DiaryWritePage() {
             disabled={!content.trim() || isSaving}
             className="flex-1 py-3 px-4 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            AI 피드백 받기
+            {t('getAIFeedback')}
           </button>
         )}
       </div>

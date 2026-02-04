@@ -1,7 +1,9 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
+import { useTranslation } from '../hooks/useTranslation'
 
 export default function Layout() {
   const location = useLocation()
+  const { t } = useTranslation()
 
   const isActive = (path: string) => location.pathname === path
 
@@ -63,7 +65,7 @@ export default function Layout() {
                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            <span className="text-xs">Home</span>
+            <span className="text-xs">{t('home')}</span>
           </Link>
           <Link
             to="/write"
@@ -79,7 +81,7 @@ export default function Layout() {
                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
               />
             </svg>
-            <span className="text-xs">Write</span>
+            <span className="text-xs">{t('write')}</span>
           </Link>
           <Link
             to="/settings"
@@ -101,7 +103,7 @@ export default function Layout() {
                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            <span className="text-xs">Settings</span>
+            <span className="text-xs">{t('settings')}</span>
           </Link>
         </div>
       </nav>
