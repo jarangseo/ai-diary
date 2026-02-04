@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from '../hooks/useTranslation'
 import { useLanguageStore } from '../stores/languageStore'
-import { useSettingsStore, type AIModel } from '../stores/settingsStore'
+import { useSettingsStore } from '../stores/settingsStore'
 
 export default function SettingsPage() {
   const { t } = useTranslation()

@@ -63,6 +63,14 @@ export const translations = {
     korean: 'Korean',
     english: 'English',
     german: 'German',
+
+    // Login Page
+    loginSubtitle: 'Record your emotions, understand yourself',
+    continueWithGoogle: 'Continue with Google',
+    continueWithGitHub: 'Continue with GitHub',
+    loginNotice: 'By signing in, you agree to our terms of service',
+    logout: 'Logout',
+    profile: 'Profile',
   },
   ko: {
     // Common
@@ -128,6 +136,14 @@ export const translations = {
     korean: '한국어',
     english: '영어',
     german: '독일어',
+
+    // Login Page
+    loginSubtitle: '감정을 기록하고, 나를 이해하세요',
+    continueWithGoogle: 'Google로 계속하기',
+    continueWithGitHub: 'GitHub로 계속하기',
+    loginNotice: '로그인하면 서비스 이용약관에 동의하게 됩니다',
+    logout: '로그아웃',
+    profile: '프로필',
   },
   de: {
     // Common
@@ -193,6 +209,14 @@ export const translations = {
     korean: 'Koreanisch',
     english: 'Englisch',
     german: 'Deutsch',
+
+    // Login Page
+    loginSubtitle: 'Notiere deine Emotionen, verstehe dich selbst',
+    continueWithGoogle: 'Mit Google fortfahren',
+    continueWithGitHub: 'Mit GitHub fortfahren',
+    loginNotice: 'Durch die Anmeldung stimmst du unseren Nutzungsbedingungen zu',
+    logout: 'Abmelden',
+    profile: 'Profil',
   },
 } as const
 

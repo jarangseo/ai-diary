@@ -36,7 +36,8 @@ const SAFETY_KEYWORDS: Record<Language, string[]> = {
   de: ['selbstverletzung', 'suizid', 'sterben wollen', 'mein leben beenden'],
 }
 
-function checkSafetyAlert(content: string, language: Language): boolean {
+function checkSafetyAlert(content: string): boolean {
+  // Check all language keywords for safety
   const keywords = [...SAFETY_KEYWORDS.ko, ...SAFETY_KEYWORDS.en, ...SAFETY_KEYWORDS.de]
   const lowerContent = content.toLowerCase()
   return keywords.some((keyword) => lowerContent.includes(keyword.toLowerCase()))
@@ -240,7 +241,7 @@ export async function POST(request: NextRequest) {
     const { content, language, model: aiModel } = parsed.data
 
     // Check for safety alert first
-    if (checkSafetyAlert(content, language)) {
+    if (checkSafetyAlert(content)) {
       return NextResponse.json(
         {
           ...SAFETY_RESPONSES[language],
