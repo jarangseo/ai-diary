@@ -8,7 +8,7 @@ import type { DiaryEmotion } from '../types/diary'
 export default function DiaryWritePage() {
   const { date } = useParams()
   const navigate = useNavigate()
-  const { t, formatDate } = useTranslation()
+  const { t, formatDate, language } = useTranslation()
   const [content, setContent] = useState('')
   const [isRecordOnly, setIsRecordOnly] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -53,7 +53,7 @@ export default function DiaryWritePage() {
     setError(null)
     try {
       await saveDiary(today, content, isRecordOnly)
-      const result = await analyzeDiary(content)
+      const result = await analyzeDiary(content, language)
       setAnalysisResult(result)
 
       // Save emotion to IndexedDB

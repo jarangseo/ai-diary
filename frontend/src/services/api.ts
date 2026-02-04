@@ -13,13 +13,13 @@ export interface AnalyzeResponse {
   }
 }
 
-export async function analyzeDiary(content: string): Promise<AnalyzeResponse> {
+export async function analyzeDiary(content: string, language: string = 'en'): Promise<AnalyzeResponse> {
   const response = await fetch(`${API_URL}/api/analyze`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ content }),
+    body: JSON.stringify({ content, language }),
   })
 
   if (!response.ok) {
