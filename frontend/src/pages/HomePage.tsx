@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
 import { useTranslation } from '../hooks/useTranslation'
 import { getAllDiaries } from '../services/db'
 import type { Diary } from '../types/diary'
@@ -93,6 +94,16 @@ export default function HomePage() {
     })
   }
 
+  // Generate chart data (only days with emotion scores)
+  const chartData = currentMonthDiaries
+    .filter((diary) => diary.emotion?.score !== undefined)
+    .map((diary) => ({
+      day: new Date(diary.date).getDate(),
+      score: diary.emotion!.score,
+      emotion: diary.emotion!.primary,
+    }))
+    .sort((a, b) => a.day - b.day)
+
   return (
     <div className="space-y-6 pb-20">
       {/* Month/Year Selector */}
@@ -171,6 +182,58 @@ export default function HomePage() {
           })}
         </div>
       </div>
+
+      {/* Emotion Trend Chart */}
+      {chartData.length > 0 && (
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+          <h2 className="font-semibold text-gray-900 mb-4">{t('emotionTrend')}</h2>
+          <div className="h-48">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis
+                  dataKey="day"
+                  tick={{ fontSize: 12, fill: '#6B7280' }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#E5E7EB' }}
+                />
+                <YAxis
+                  domain={[-1, 1]}
+                  ticks={[-1, -0.5, 0, 0.5, 1]}
+                  tick={{ fontSize: 12, fill: '#6B7280' }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#E5E7EB' }}
+                />
+                <Tooltip
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0].payload
+                      return (
+                        <div className="bg-white border border-gray-200 rounded-lg p-2 shadow-lg">
+                          <p className="text-sm font-medium">{data.emotion}</p>
+                          <p className="text-xs text-gray-500">
+                            {t('emotionScore')}: {data.score.toFixed(2)}
+                          </p>
+                        </div>
+                      )
+                    }
+                    return null
+                  }}
+                />
+                <ReferenceLine y={0} stroke="#9CA3AF" strokeDasharray="3 3" />
+                <Line
+                  type="monotone"
+                  dataKey="score"
+                  stroke="#3B82F6"
+                  strokeWidth={2}
+                  dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, fill: '#2563EB' }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
 
       {/* Empty State */}
       {diaries.length === 0 && (

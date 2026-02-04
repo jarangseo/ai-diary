@@ -23,6 +23,7 @@ export const translations = {
     emptyStateMessage: 'Start your first entry',
     writeTodayDiary: "Write today's diary",
     weekdays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+    emotionTrend: 'Emotion Trend',
 
     // Write Page
     howWasYourDay: 'How was your day?',
@@ -87,6 +88,7 @@ export const translations = {
     emptyStateMessage: '첫 기록을 남겨보세요',
     writeTodayDiary: '오늘 일기 쓰기',
     weekdays: ['일', '월', '화', '수', '목', '금', '토'],
+    emotionTrend: '감정 추이',
 
     // Write Page
     howWasYourDay: '오늘 하루는 어땠나요?',
@@ -151,6 +153,7 @@ export const translations = {
     emptyStateMessage: 'Beginne deinen ersten Eintrag',
     writeTodayDiary: 'Tagebuch schreiben',
     weekdays: ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'],
+    emotionTrend: 'Emotionsverlauf',
 
     // Write Page
     howWasYourDay: 'Wie war dein Tag?',
