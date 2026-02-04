@@ -28,9 +28,8 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
 
       login: (provider) => {
-        // Redirect to NextAuth sign in with callback to frontend
-        const callbackUrl = encodeURIComponent(window.location.origin)
-        window.location.href = `${API_URL}/api/auth/signin/${provider}?callbackUrl=${callbackUrl}`
+        // Redirect to NextAuth sign in (backend handles redirect to frontend)
+        window.location.href = `${API_URL}/api/auth/signin/${provider}`
       },
 
       logout: async () => {
@@ -39,8 +38,7 @@ export const useAuthStore = create<AuthState>()(
           set({ user: null, isAuthenticated: false })
 
           // Call NextAuth signout via redirect
-          const callbackUrl = encodeURIComponent(`${window.location.origin}/login`)
-          window.location.href = `${API_URL}/api/auth/signout?callbackUrl=${callbackUrl}`
+          window.location.href = `${API_URL}/api/auth/signout`
         } catch (error) {
           console.error('Logout error:', error)
         }
