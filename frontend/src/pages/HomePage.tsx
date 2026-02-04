@@ -4,6 +4,26 @@ import { useTranslation } from '../hooks/useTranslation'
 import { getAllDiaries } from '../services/db'
 import type { Diary } from '../types/diary'
 
+// Get emotion color based on score (-1 to 1)
+function getEmotionColor(score: number | undefined): { bg: string; hover: string } {
+  if (score === undefined) {
+    return { bg: 'bg-gray-300', hover: 'hover:bg-gray-400' }
+  }
+  if (score <= -0.6) {
+    return { bg: 'bg-indigo-400', hover: 'hover:bg-indigo-500' }
+  }
+  if (score <= -0.2) {
+    return { bg: 'bg-blue-300', hover: 'hover:bg-blue-400' }
+  }
+  if (score <= 0.2) {
+    return { bg: 'bg-gray-300', hover: 'hover:bg-gray-400' }
+  }
+  if (score <= 0.6) {
+    return { bg: 'bg-yellow-300', hover: 'hover:bg-yellow-400' }
+  }
+  return { bg: 'bg-orange-300', hover: 'hover:bg-orange-400' }
+}
+
 export default function HomePage() {
   const { t, formatMonthYear } = useTranslation()
   const weekdays = t('weekdays') as string[]
@@ -27,9 +47,9 @@ export default function HomePage() {
     return diaryDate.getFullYear() === year && diaryDate.getMonth() === month
   })
 
-  // Create a set of days that have diary entries
-  const daysWithDiary = new Set(
-    currentMonthDiaries.map((diary) => new Date(diary.date).getDate())
+  // Create a map of days to their diary data (including emotion score)
+  const diaryByDay = new Map(
+    currentMonthDiaries.map((diary) => [new Date(diary.date).getDate(), diary])
   )
 
   // Calculate main emotion (most frequent)
@@ -63,7 +83,14 @@ export default function HomePage() {
   }
   for (let day = 1; day <= daysInMonth; day++) {
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-    calendarCells.push({ day, key: dateStr, date: dateStr, hasDiary: daysWithDiary.has(day) })
+    const diary = diaryByDay.get(day)
+    calendarCells.push({
+      day,
+      key: dateStr,
+      date: dateStr,
+      hasDiary: !!diary,
+      emotionScore: diary?.emotion?.score,
+    })
   }
 
   return (
@@ -123,23 +150,25 @@ export default function HomePage() {
           ))}
         </div>
         <div className="grid grid-cols-7 gap-1">
-          {calendarCells.map((cell) => (
-            cell.day === null ? (
-              <div key={cell.key} className="aspect-square" />
-            ) : (
+          {calendarCells.map((cell) => {
+            if (cell.day === null) {
+              return <div key={cell.key} className="aspect-square" />
+            }
+            const emotionColor = getEmotionColor(cell.emotionScore)
+            return (
               <Link
                 key={cell.key}
                 to={cell.hasDiary ? `/diary/${cell.date}` : `/write/${cell.date}`}
                 className={`aspect-square rounded-md flex items-center justify-center text-sm transition-colors ${
                   cell.hasDiary
-                    ? 'bg-blue-500 text-white hover:bg-blue-600'
+                    ? `${emotionColor.bg} text-white ${emotionColor.hover}`
                     : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
                 }`}
               >
                 {cell.day}
               </Link>
             )
-          ))}
+          })}
         </div>
       </div>
 
