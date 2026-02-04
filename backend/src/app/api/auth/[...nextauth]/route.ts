@@ -9,6 +9,15 @@ interface ExtendedToken extends JWT {
   id?: string
 }
 
+// Ensure FRONTEND_URL has protocol
+const getFrontendUrl = () => {
+  const url = process.env.FRONTEND_URL || 'http://localhost:5173'
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url
+  }
+  return `https://${url}`
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
@@ -43,14 +52,21 @@ export const authOptions: NextAuthOptions = {
         } as { id?: string; name?: string | null; email?: string | null; image?: string | null },
       }
     },
-    async redirect({ url }) {
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173'
+    async redirect({ url, baseUrl }) {
+      const frontendUrl = getFrontendUrl()
+      // Allow callback to frontend URL
       if (url.startsWith(frontendUrl)) {
         return url
       }
+      // Handle relative URLs
       if (url.startsWith('/')) {
         return `${frontendUrl}${url}`
       }
+      // Handle URLs without protocol (e.g., "ai-diary-lac.vercel.app")
+      if (url.includes('vercel.app') || url.includes('localhost')) {
+        return `https://${url.replace(/^https?:\/\//, '')}`
+      }
+      // Default to frontend
       return frontendUrl
     },
   },
