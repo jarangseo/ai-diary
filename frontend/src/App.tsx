@@ -1,13 +1,14 @@
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { Routes, Route, useNavigate } from 'react-router-dom'
-import HomePage from '@/pages/HomePage'
-import DiaryWritePage from '@/pages/DiaryWritePage'
-import DiaryDetailPage from '@/pages/DiaryDetailPage'
-import SettingsPage from '@/pages/SettingsPage'
-import LoginPage from '@/pages/LoginPage'
 import Layout from '@/components/Layout'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { useAuthStore } from '@/stores/authStore'
+
+const HomePage = lazy(() => import('@/pages/HomePage'))
+const DiaryWritePage = lazy(() => import('@/pages/DiaryWritePage'))
+const DiaryDetailPage = lazy(() => import('@/pages/DiaryDetailPage'))
+const SettingsPage = lazy(() => import('@/pages/SettingsPage'))
+const LoginPage = lazy(() => import('@/pages/LoginPage'))
 
 function App() {
   const checkSession = useAuthStore((state) => state.checkSession)
@@ -39,22 +40,32 @@ function App() {
   }, [checkSession, navigate])
 
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route
-        element={
-          <ProtectedRoute>
-            <Layout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="/" element={<HomePage />} />
-        <Route path="/write" element={<DiaryWritePage />} />
-        <Route path="/write/:date" element={<DiaryWritePage />} />
-        <Route path="/diary/:date" element={<DiaryDetailPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-      </Route>
-    </Routes>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" role="status">
+            <span className="sr-only">Loading...</span>
+          </div>
+        </div>
+      }
+    >
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/" element={<HomePage />} />
+          <Route path="/write" element={<DiaryWritePage />} />
+          <Route path="/write/:date" element={<DiaryWritePage />} />
+          <Route path="/diary/:date" element={<DiaryDetailPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+        </Route>
+      </Routes>
+    </Suspense>
   )
 }
 

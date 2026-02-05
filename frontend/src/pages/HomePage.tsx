@@ -3,36 +3,8 @@ import { Link } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
 import { useTranslation } from '../hooks/useTranslation'
 import { getAllDiaries } from '../services/db'
+import { getEmotionColor, getEmotionHex } from '../utils/emotion'
 import type { Diary } from '../types/diary'
-
-// Get emotion color based on score (-1 to 1)
-function getEmotionColor(score: number | undefined): { bg: string; hover: string } {
-  if (score === undefined) {
-    return { bg: 'bg-gray-300', hover: 'hover:bg-gray-400' }
-  }
-  if (score <= -0.6) {
-    return { bg: 'bg-indigo-400', hover: 'hover:bg-indigo-500' }
-  }
-  if (score <= -0.2) {
-    return { bg: 'bg-blue-300', hover: 'hover:bg-blue-400' }
-  }
-  if (score <= 0.2) {
-    return { bg: 'bg-gray-300', hover: 'hover:bg-gray-400' }
-  }
-  if (score <= 0.6) {
-    return { bg: 'bg-yellow-300', hover: 'hover:bg-yellow-400' }
-  }
-  return { bg: 'bg-orange-300', hover: 'hover:bg-orange-400' }
-}
-
-// Hex color for chart dots and gradient
-function getEmotionHex(score: number): string {
-  if (score <= -0.6) return '#818CF8' // indigo-400
-  if (score <= -0.2) return '#93C5FD' // blue-300
-  if (score <= 0.2) return '#D1D5DB'  // gray-300
-  if (score <= 0.6) return '#FDE047'  // yellow-300
-  return '#FDBA74'                     // orange-300
-}
 
 export default function HomePage() {
   const { t, formatMonthYear } = useTranslation()
@@ -120,9 +92,10 @@ export default function HomePage() {
         <div className="flex items-center gap-2">
           <button
             onClick={goToPrevMonth}
+            aria-label="Previous month"
             className="p-1 text-gray-600 hover:text-gray-900"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
@@ -131,9 +104,10 @@ export default function HomePage() {
           </h1>
           <button
             onClick={goToNextMonth}
+            aria-label="Next month"
             className="p-1 text-gray-600 hover:text-gray-900"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
@@ -163,10 +137,10 @@ export default function HomePage() {
       </div>
 
       {/* Calendar */}
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-        <div className="grid grid-cols-7 gap-1 text-center text-xs text-gray-500 mb-2">
+      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100" role="grid" aria-label="Monthly calendar">
+        <div className="grid grid-cols-7 gap-1 text-center text-xs text-gray-500 mb-2" role="row">
           {weekdays.map((day) => (
-            <span key={day}>{day}</span>
+            <span key={day} role="columnheader">{day}</span>
           ))}
         </div>
         <div className="grid grid-cols-7 gap-1">

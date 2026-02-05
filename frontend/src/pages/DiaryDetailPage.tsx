@@ -38,7 +38,7 @@ export default function DiaryDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex items-center justify-center h-64" role="status">
         <div className="text-gray-500">{t('loading')}</div>
       </div>
     )
@@ -50,9 +50,10 @@ export default function DiaryDetailPage() {
         <div className="flex items-center">
           <button
             onClick={() => navigate(-1)}
+            aria-label="Go back"
             className="p-2 -ml-2 text-gray-600 hover:text-gray-900"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
@@ -76,14 +77,15 @@ export default function DiaryDetailPage() {
       <div className="flex items-center justify-between">
         <button
           onClick={() => navigate(-1)}
+          aria-label="Go back"
           className="p-2 -ml-2 text-gray-600 hover:text-gray-900"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <button className="p-2 -mr-2 text-gray-600 hover:text-gray-900">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button aria-label="More options" className="p-2 -mr-2 text-gray-600 hover:text-gray-900">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -99,7 +101,7 @@ export default function DiaryDetailPage() {
 
       {/* Emotion Badge (if available) */}
       {diary.emotion && (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3" role="status" aria-label="Emotion analysis result">
           <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
             {diary.emotion.primary}
           </span>

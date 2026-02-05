@@ -32,6 +32,7 @@ export default function SettingsPage() {
         <div className="flex gap-2">
           <button
             onClick={() => setLanguage('en')}
+            aria-pressed={language === 'en'}
             className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
               language === 'en'
                 ? 'bg-blue-600 text-white'
@@ -42,6 +43,7 @@ export default function SettingsPage() {
           </button>
           <button
             onClick={() => setLanguage('ko')}
+            aria-pressed={language === 'ko'}
             className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
               language === 'ko'
                 ? 'bg-blue-600 text-white'
@@ -52,6 +54,7 @@ export default function SettingsPage() {
           </button>
           <button
             onClick={() => setLanguage('de')}
+            aria-pressed={language === 'de'}
             className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
               language === 'de'
                 ? 'bg-blue-600 text-white'
@@ -94,6 +97,7 @@ export default function SettingsPage() {
             <button
               onClick={() => setAIModel('openai')}
               disabled={!aiEnabled}
+              aria-pressed={aiModel === 'openai'}
               className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
                 aiModel === 'openai'
                   ? 'bg-blue-600 text-white'
@@ -105,6 +109,7 @@ export default function SettingsPage() {
             <button
               onClick={() => setAIModel('gemini')}
               disabled={!aiEnabled}
+              aria-pressed={aiModel === 'gemini'}
               className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
                 aiModel === 'gemini'
                   ? 'bg-blue-600 text-white'

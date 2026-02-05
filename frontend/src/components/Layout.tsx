@@ -52,15 +52,16 @@ export default function Layout() {
       </main>
 
       {/* Bottom Navigation (Mobile) */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden" aria-label="Main navigation">
         <div className="flex justify-around items-center h-16">
           <Link
             to="/"
+            aria-current={isActive('/') ? 'page' : undefined}
             className={`flex flex-col items-center gap-1 px-4 py-2 ${
               isActive('/') ? 'text-blue-600' : 'text-gray-600'
             }`}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -72,11 +73,12 @@ export default function Layout() {
           </Link>
           <Link
             to="/write"
+            aria-current={location.pathname.startsWith('/write') ? 'page' : undefined}
             className={`flex flex-col items-center gap-1 px-4 py-2 ${
               location.pathname.startsWith('/write') ? 'text-blue-600' : 'text-gray-600'
             }`}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -88,11 +90,12 @@ export default function Layout() {
           </Link>
           <Link
             to="/settings"
+            aria-current={isActive('/settings') ? 'page' : undefined}
             className={`flex flex-col items-center gap-1 px-4 py-2 ${
               isActive('/settings') ? 'text-blue-600' : 'text-gray-600'
             }`}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

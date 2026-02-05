@@ -79,13 +79,14 @@ export default function DiaryWritePage() {
       <div className="flex items-center justify-between">
         <button
           onClick={() => navigate(-1)}
+          aria-label="Go back"
           className="p-2 -ml-2 text-gray-600 hover:text-gray-900"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-gray-500" role="status" aria-live="polite">
           {isSaving ? t('saving') : t('autoSaved')}
         </span>
       </div>
@@ -98,6 +99,7 @@ export default function DiaryWritePage() {
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder={t('howWasYourDay') as string}
+        aria-label="Diary content"
         className="w-full h-64 p-4 bg-white border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
       />
 
@@ -134,7 +136,7 @@ export default function DiaryWritePage() {
 
       {/* Error Message */}
       {error && (
-        <div className="p-4 bg-red-50 border border-red-100 rounded-xl">
+        <div role="alert" aria-live="assertive" className="p-4 bg-red-50 border border-red-100 rounded-xl">
           <p className="text-red-600 text-sm">{error}</p>
         </div>
       )}
