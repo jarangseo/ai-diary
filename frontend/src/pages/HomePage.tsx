@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
 import { useTranslation } from '../hooks/useTranslation'
@@ -24,66 +24,75 @@ export default function HomePage() {
   const daysInMonth = new Date(year, month + 1, 0).getDate()
 
   // Filter diaries for current month
-  const currentMonthDiaries = diaries.filter((diary) => {
-    const diaryDate = new Date(diary.date)
-    return diaryDate.getFullYear() === year && diaryDate.getMonth() === month
-  })
-
-  // Create a map of days to their diary data (including emotion score)
-  const diaryByDay = new Map(
-    currentMonthDiaries.map((diary) => [new Date(diary.date).getDate(), diary])
+  const currentMonthDiaries = useMemo(
+    () => diaries.filter((diary) => {
+      const diaryDate = new Date(diary.date)
+      return diaryDate.getFullYear() === year && diaryDate.getMonth() === month
+    }),
+    [diaries, year, month]
   )
 
   // Calculate main emotion (most frequent)
-  const emotionCounts = currentMonthDiaries.reduce(
-    (acc, diary) => {
-      if (diary.emotion?.primary) {
-        acc[diary.emotion.primary] = (acc[diary.emotion.primary] || 0) + 1
-      }
-      return acc
-    },
-    {} as Record<string, number>
-  )
-  const mainEmotion = Object.entries(emotionCounts).sort((a, b) => b[1] - a[1])[0]?.[0]
+  const mainEmotion = useMemo(() => {
+    const counts = currentMonthDiaries.reduce(
+      (acc, diary) => {
+        if (diary.emotion?.primary) {
+          acc[diary.emotion.primary] = (acc[diary.emotion.primary] || 0) + 1
+        }
+        return acc
+      },
+      {} as Record<string, number>
+    )
+    return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0]
+  }, [currentMonthDiaries])
 
-  const goToPrevMonth = () => {
+  const goToPrevMonth = useCallback(() => {
     setCurrentDate(new Date(year, month - 1, 1))
-  }
+  }, [year, month])
 
-  const goToNextMonth = () => {
+  const goToNextMonth = useCallback(() => {
     setCurrentDate(new Date(year, month + 1, 1))
-  }
+  }, [year, month])
 
-  const goToToday = () => {
+  const goToToday = useCallback(() => {
     setCurrentDate(new Date())
-  }
+  }, [])
 
   // Generate calendar cells
-  const calendarCells = []
-  for (let i = 0; i < firstDayOfMonth; i++) {
-    calendarCells.push({ day: null, key: `empty-${i}` })
-  }
-  for (let day = 1; day <= daysInMonth; day++) {
-    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-    const diary = diaryByDay.get(day)
-    calendarCells.push({
-      day,
-      key: dateStr,
-      date: dateStr,
-      hasDiary: !!diary,
-      emotionScore: diary?.emotion?.score,
-    })
-  }
+  const calendarCells = useMemo(() => {
+    const diaryByDay = new Map(
+      currentMonthDiaries.map((diary) => [new Date(diary.date).getDate(), diary])
+    )
+    const cells = []
+    for (let i = 0; i < firstDayOfMonth; i++) {
+      cells.push({ day: null as number | null, key: `empty-${i}`, date: '', hasDiary: false, emotionScore: undefined as number | undefined })
+    }
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+      const diary = diaryByDay.get(day)
+      cells.push({
+        day,
+        key: dateStr,
+        date: dateStr,
+        hasDiary: !!diary,
+        emotionScore: diary?.emotion?.score,
+      })
+    }
+    return cells
+  }, [currentMonthDiaries, firstDayOfMonth, daysInMonth, year, month])
 
   // Generate chart data (only days with emotion scores)
-  const chartData = currentMonthDiaries
-    .filter((diary) => diary.emotion?.score !== undefined)
-    .map((diary) => ({
-      day: new Date(diary.date).getDate(),
-      score: diary.emotion!.score,
-      emotion: diary.emotion!.primary,
-    }))
-    .sort((a, b) => a.day - b.day)
+  const chartData = useMemo(
+    () => currentMonthDiaries
+      .filter((diary) => diary.emotion?.score !== undefined)
+      .map((diary) => ({
+        day: new Date(diary.date).getDate(),
+        score: diary.emotion!.score,
+        emotion: diary.emotion!.primary,
+      }))
+      .sort((a, b) => a.day - b.day),
+    [currentMonthDiaries]
+  )
 
   return (
     <div className="space-y-6 pb-20">

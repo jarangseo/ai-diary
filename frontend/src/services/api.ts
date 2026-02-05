@@ -30,7 +30,14 @@ export async function analyzeDiary(
   })
 
   if (!response.ok) {
-    throw new Error('Failed to analyze diary')
+    if (response.status === 429) {
+      throw new Error('Rate limit exceeded. Please try again later.')
+    }
+    if (response.status >= 500) {
+      throw new Error('Server error. Please try again later.')
+    }
+    const body = await response.text().catch(() => '')
+    throw new Error(body || `Analysis failed (${response.status})`)
   }
 
   return response.json()

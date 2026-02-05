@@ -35,15 +35,11 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: async () => {
-        try {
-          // Clear local state first
-          set({ user: null, isAuthenticated: false })
+        // Clear local state first
+        set({ user: null, isAuthenticated: false })
 
-          // Pass callbackUrl=/ for same reason as login
-          window.location.href = `${API_URL}/api/auth/signout?callbackUrl=%2F`
-        } catch (error) {
-          console.error('Logout error:', error)
-        }
+        // Pass callbackUrl=/ for same reason as login
+        window.location.href = `${API_URL}/api/auth/signout?callbackUrl=%2F`
       },
 
       checkSession: async () => {

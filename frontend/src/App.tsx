@@ -3,6 +3,7 @@ import { Routes, Route, useNavigate } from 'react-router-dom'
 import Layout from '@/components/Layout'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { useAuthStore } from '@/stores/authStore'
+import type { User } from '@/stores/authStore'
 
 const HomePage = lazy(() => import('@/pages/HomePage'))
 const DiaryWritePage = lazy(() => import('@/pages/DiaryWritePage'))
@@ -21,14 +22,30 @@ function App() {
 
     if (authData) {
       try {
-        const user = JSON.parse(atob(authData))
-        useAuthStore.setState({
-          user,
-          isAuthenticated: true,
-          isLoading: false,
-        })
-      } catch (e) {
-        console.error('Failed to parse auth data:', e)
+        const decoded = JSON.parse(atob(authData))
+
+        // Validate shape before trusting URL data
+        if (
+          typeof decoded === 'object' &&
+          decoded !== null &&
+          typeof decoded.id === 'string' &&
+          typeof decoded.provider === 'string'
+        ) {
+          const user: User = {
+            id: decoded.id,
+            name: typeof decoded.name === 'string' ? decoded.name : null,
+            email: typeof decoded.email === 'string' ? decoded.email : null,
+            image: typeof decoded.image === 'string' ? decoded.image : null,
+            provider: decoded.provider,
+          }
+          useAuthStore.setState({
+            user,
+            isAuthenticated: true,
+            isLoading: false,
+          })
+        }
+      } catch {
+        console.error('Failed to parse auth data')
       }
       // Clean up URL
       window.history.replaceState({}, '', '/')

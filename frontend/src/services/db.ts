@@ -9,8 +9,8 @@ function getUserId(): string | null {
       const parsed = JSON.parse(authStorage)
       return parsed?.state?.user?.id ?? null
     }
-  } catch {
-    // ignore
+  } catch (error) {
+    console.error('Failed to read auth storage:', error)
   }
   return null
 }
