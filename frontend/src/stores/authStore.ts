@@ -47,48 +47,14 @@ export const useAuthStore = create<AuthState>()(
       },
 
       checkSession: async () => {
-        set({ isLoading: true })
-        try {
-          const response = await fetch(`${API_URL}/api/auth/session`, {
-            credentials: 'include',
-          })
-
-          if (!response.ok) {
-            throw new Error('Session check failed')
-          }
-
-          const session = await response.json()
-
-          if (session?.user?.email) {
-            set({
-              user: {
-                id: session.user.id || session.user.email,
-                name: session.user.name,
-                email: session.user.email,
-                image: session.user.image,
-                provider: session.provider || 'unknown',
-              },
-              isAuthenticated: true,
-              isLoading: false,
-            })
-          } else {
-            // No session, check if we have stored user (for development)
-            const currentUser = get().user
-            if (currentUser) {
-              set({ isAuthenticated: true, isLoading: false })
-            } else {
-              set({ user: null, isAuthenticated: false, isLoading: false })
-            }
-          }
-        } catch (error) {
-          console.error('Session check error:', error)
-          // If session check fails, use stored user if available
-          const currentUser = get().user
-          if (currentUser) {
-            set({ isAuthenticated: true, isLoading: false })
-          } else {
-            set({ user: null, isAuthenticated: false, isLoading: false })
-          }
+        // Use localStorage (Zustand persist) for session state.
+        // Cross-origin cookies don't work between frontend/backend domains,
+        // so we rely on the auth data passed via URL after OAuth callback.
+        const currentUser = get().user
+        if (currentUser) {
+          set({ isAuthenticated: true, isLoading: false })
+        } else {
+          set({ user: null, isAuthenticated: false, isLoading: false })
         }
       },
     }),

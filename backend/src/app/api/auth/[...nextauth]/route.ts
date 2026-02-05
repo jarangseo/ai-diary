@@ -52,22 +52,10 @@ export const authOptions: NextAuthOptions = {
         } as { id?: string; name?: string | null; email?: string | null; image?: string | null },
       }
     },
-    async redirect({ url, baseUrl }) {
-      const frontendUrl = getFrontendUrl()
-      // Allow callback to frontend URL
-      if (url.startsWith(frontendUrl)) {
-        return url
-      }
-      // Handle relative URLs
-      if (url.startsWith('/')) {
-        return `${frontendUrl}${url}`
-      }
-      // Handle URLs without protocol (e.g., "ai-diary-lac.vercel.app")
-      if (url.includes('vercel.app') || url.includes('localhost')) {
-        return `https://${url.replace(/^https?:\/\//, '')}`
-      }
-      // Default to frontend
-      return frontendUrl
+    async redirect({ baseUrl }) {
+      // After auth, redirect to callback-redirect endpoint (same origin)
+      // which reads the session cookie and passes user data to frontend via URL
+      return `${baseUrl}/api/auth/callback-redirect`
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
