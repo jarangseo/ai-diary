@@ -25,6 +25,15 @@ function getEmotionColor(score: number | undefined): { bg: string; hover: string
   return { bg: 'bg-orange-300', hover: 'hover:bg-orange-400' }
 }
 
+// Hex color for chart dots and gradient
+function getEmotionHex(score: number): string {
+  if (score <= -0.6) return '#818CF8' // indigo-400
+  if (score <= -0.2) return '#93C5FD' // blue-300
+  if (score <= 0.2) return '#D1D5DB'  // gray-300
+  if (score <= 0.6) return '#FDE047'  // yellow-300
+  return '#FDBA74'                     // orange-300
+}
+
 export default function HomePage() {
   const { t, formatMonthYear } = useTranslation()
   const weekdays = t('weekdays') as string[]
@@ -190,6 +199,17 @@ export default function HomePage() {
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
+                <defs>
+                  <linearGradient id="emotionGradient" x1="0" y1="0" x2="1" y2="0">
+                    {chartData.map((d, i) => (
+                      <stop
+                        key={i}
+                        offset={chartData.length > 1 ? `${(i / (chartData.length - 1)) * 100}%` : '50%'}
+                        stopColor={getEmotionHex(d.score)}
+                      />
+                    ))}
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                 <XAxis
                   dataKey="day"
@@ -208,10 +228,14 @@ export default function HomePage() {
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
                       const data = payload[0].payload
+                      const color = getEmotionHex(data.score)
                       return (
-                        <div className="bg-white border border-gray-200 rounded-lg p-2 shadow-lg">
-                          <p className="text-sm font-medium">{data.emotion}</p>
-                          <p className="text-xs text-gray-500">
+                        <div
+                          className="rounded-lg p-2 shadow-lg border"
+                          style={{ backgroundColor: color, borderColor: color }}
+                        >
+                          <p className="text-sm font-bold text-white drop-shadow-sm">{data.emotion}</p>
+                          <p className="text-xs text-white/80 drop-shadow-sm">
                             {t('emotionScore')}: {data.score.toFixed(2)}
                           </p>
                         </div>
@@ -224,10 +248,36 @@ export default function HomePage() {
                 <Line
                   type="monotone"
                   dataKey="score"
-                  stroke="#3B82F6"
+                  stroke="url(#emotionGradient)"
                   strokeWidth={2}
-                  dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
-                  activeDot={{ r: 6, fill: '#2563EB' }}
+                  dot={(props: { cx?: number; cy?: number; payload?: { score: number } }) => {
+                    if (props.cx == null || props.cy == null || !props.payload) return <></>
+                    const color = getEmotionHex(props.payload.score)
+                    return (
+                      <circle
+                        cx={props.cx}
+                        cy={props.cy}
+                        r={5}
+                        fill={color}
+                        stroke="#fff"
+                        strokeWidth={2}
+                      />
+                    )
+                  }}
+                  activeDot={(props: { cx?: number; cy?: number; payload?: { score: number } }) => {
+                    if (props.cx == null || props.cy == null || !props.payload) return <></>
+                    const color = getEmotionHex(props.payload.score)
+                    return (
+                      <circle
+                        cx={props.cx}
+                        cy={props.cy}
+                        r={7}
+                        fill={color}
+                        stroke="#fff"
+                        strokeWidth={2}
+                      />
+                    )
+                  }}
                 />
               </LineChart>
             </ResponsiveContainer>

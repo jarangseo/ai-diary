@@ -14,7 +14,8 @@ export default function Layout() {
       {/* Header */}
       <header className="sticky top-0 z-10 bg-white border-b border-gray-200">
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link to="/" className="text-xl font-semibold text-gray-900">
+          <Link to="/" className="flex items-center gap-2 text-xl font-semibold text-gray-900">
+            <img src="/favicon.svg" alt="AI Diary" className="w-7 h-7" />
             AI Diary
           </Link>
           <div className="flex items-center gap-2">
