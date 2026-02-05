@@ -1,5 +1,7 @@
 # AI Diary
 
+> **Live Demo:** https://ai-diary-lac.vercel.app/
+
 AI-powered personal diary with emotion analysis, built with React and Next.js.
 
 Write daily entries and receive AI-driven emotional insights, trend visualizations, and reflective questions to support self-awareness.
