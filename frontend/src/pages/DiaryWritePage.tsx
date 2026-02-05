@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { saveDiary, getDiary, updateDiaryEmotion } from '../services/db'
-import { analyzeDiary, type AnalyzeResponse } from '../services/api'
+import { type AnalyzeResponse } from '../services/api'
 import { useTranslation } from '../hooks/useTranslation'
 import { useSettingsStore } from '../stores/settingsStore'
-import type { DiaryEmotion } from '../types/diary'
+import { useDiary, useSaveDiary, useAnalyzeDiary } from '../hooks/useDiaries'
 
 export default function DiaryWritePage() {
   const { date } = useParams()
@@ -13,63 +12,59 @@ export default function DiaryWritePage() {
   const aiModel = useSettingsStore((state) => state.aiModel)
   const [content, setContent] = useState('')
   const [isRecordOnly, setIsRecordOnly] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analysisResult, setAnalysisResult] = useState<AnalyzeResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const today = date || new Date().toISOString().split('T')[0]
   const formattedDate = formatDate(today)
 
-  useEffect(() => {
-    getDiary(today).then((diary) => {
-      if (diary) {
-        setContent(diary.content)
-        setIsRecordOnly(diary.isRecordOnly)
-        if (diary.emotion) {
-          setAnalysisResult({
-            primaryEmotion: diary.emotion.primary,
-            secondaryEmotions: [],
-            emotionScore: diary.emotion.score,
-            summary: diary.emotion.summary,
-            reflectionQuestions: diary.emotion.questions || [],
-            isSafetyAlert: false,
-          })
-        }
-      }
-    })
-  }, [today])
+  const { data: existingDiary } = useDiary(today)
+  const saveMutation = useSaveDiary()
+  const analyzeMutation = useAnalyzeDiary()
 
-  const handleSave = async () => {
-    setIsSaving(true)
-    try {
-      await saveDiary(today, content, isRecordOnly)
-      navigate(-1)
-    } finally {
-      setIsSaving(false)
+  const isSaving = saveMutation.isPending
+  const isAnalyzing = analyzeMutation.isPending
+
+  // Sync form state from fetched diary (render-time state adjustment)
+  const [syncedDiary, setSyncedDiary] = useState(existingDiary)
+  if (existingDiary !== syncedDiary) {
+    setSyncedDiary(existingDiary)
+    if (existingDiary) {
+      setContent(existingDiary.content)
+      setIsRecordOnly(existingDiary.isRecordOnly)
+      if (existingDiary.emotion) {
+        setAnalysisResult({
+          primaryEmotion: existingDiary.emotion.primary,
+          secondaryEmotions: [],
+          emotionScore: existingDiary.emotion.score,
+          summary: existingDiary.emotion.summary,
+          reflectionQuestions: existingDiary.emotion.questions || [],
+          isSafetyAlert: false,
+        })
+      }
     }
   }
 
+  const handleSave = () => {
+    saveMutation.mutate(
+      { date: today, content, isRecordOnly },
+      { onSuccess: () => navigate(-1) }
+    )
+  }
+
   const handleRequestAI = async () => {
-    setIsAnalyzing(true)
     setError(null)
     try {
-      await saveDiary(today, content, isRecordOnly)
-      const result = await analyzeDiary(content, language, aiModel)
+      await saveMutation.mutateAsync({ date: today, content, isRecordOnly })
+      const result = await analyzeMutation.mutateAsync({
+        date: today,
+        content,
+        language,
+        aiModel,
+      })
       setAnalysisResult(result)
-
-      // Save emotion to IndexedDB
-      const emotion: DiaryEmotion = {
-        primary: result.primaryEmotion,
-        score: result.emotionScore,
-        summary: result.summary,
-        questions: result.reflectionQuestions,
-      }
-      await updateDiaryEmotion(today, emotion)
     } catch {
       setError(t('analysisError') as string)
-    } finally {
-      setIsAnalyzing(false)
     }
   }
 

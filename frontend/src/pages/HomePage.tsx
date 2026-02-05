@@ -1,20 +1,15 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useMemo, useCallback, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
 import { useTranslation } from '../hooks/useTranslation'
-import { getAllDiaries } from '../services/db'
+import { useAllDiaries } from '../hooks/useDiaries'
 import { getEmotionColor, getEmotionHex } from '../utils/emotion'
-import type { Diary } from '../types/diary'
 
 export default function HomePage() {
   const { t, formatMonthYear } = useTranslation()
   const weekdays = t('weekdays') as string[]
-  const [diaries, setDiaries] = useState<Diary[]>([])
+  const { data: diaries = [], isLoading } = useAllDiaries()
   const [currentDate, setCurrentDate] = useState(new Date())
-
-  useEffect(() => {
-    getAllDiaries().then(setDiaries)
-  }, [])
 
   const year = currentDate.getFullYear()
   const month = currentDate.getMonth()
@@ -268,8 +263,15 @@ export default function HomePage() {
         </div>
       )}
 
+      {/* Loading State */}
+      {isLoading && (
+        <div className="flex items-center justify-center h-32" role="status">
+          <div className="text-gray-500">{t('loading')}</div>
+        </div>
+      )}
+
       {/* Empty State */}
-      {diaries.length === 0 && (
+      {!isLoading && diaries.length === 0 && (
         <div className="text-center py-8">
           <p className="text-gray-500 mb-4">{t('emptyStateMessage')}</p>
         </div>

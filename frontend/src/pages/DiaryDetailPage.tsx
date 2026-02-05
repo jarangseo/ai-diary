@@ -1,39 +1,23 @@
-import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { getDiary, deleteDiary } from '../services/db'
 import { useTranslation } from '../hooks/useTranslation'
-import type { Diary } from '../types/diary'
+import { useDiary, useDeleteDiary } from '../hooks/useDiaries'
 
 export default function DiaryDetailPage() {
   const { date } = useParams()
   const navigate = useNavigate()
   const { t, formatDate } = useTranslation()
-  const [diary, setDiary] = useState<Diary | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+
+  const { data: diary, isLoading } = useDiary(date)
+  const deleteMutation = useDeleteDiary()
 
   const formattedDate = date ? formatDate(date) : ''
 
-  useEffect(() => {
-    if (!date) return
-
-    let cancelled = false
-    getDiary(date).then((data) => {
-      if (!cancelled) {
-        setDiary(data ?? null)
-        setIsLoading(false)
-      }
-    })
-
-    return () => {
-      cancelled = true
-    }
-  }, [date])
-
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!date || !confirm(t('confirmDelete') as string)) return
 
-    await deleteDiary(date)
-    navigate('/')
+    deleteMutation.mutate(date, {
+      onSuccess: () => navigate('/'),
+    })
   }
 
   if (isLoading) {
